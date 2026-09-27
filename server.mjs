@@ -20,6 +20,11 @@ createServer(async (request, response) => {
     const url = new URL(request.url, "http://localhost");
     if (await handleDuelApi(request, response, url)) return;
     const pathname = decodeURIComponent(url.pathname);
+    if (pathname === "/duel.html") {
+      response.writeHead(308, { location: `/${url.search}` });
+      response.end();
+      return;
+    }
     const relative = normalize(pathname === "/" ? "index.html" : pathname.replace(/^\/+/, ""));
     const target = join(root, relative);
     if (!target.startsWith(root)) throw new Error("invalid path");
@@ -36,5 +41,4 @@ createServer(async (request, response) => {
   }
 }).listen(port, "0.0.0.0", () => {
   console.log(`GRID BREAKER is running at http://localhost:${port}`);
-  console.log(`DUEL MODE is available at http://localhost:${port}/duel.html`);
 });

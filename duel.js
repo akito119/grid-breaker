@@ -115,7 +115,7 @@ function settingsFromForm(form) {
 }
 
 function createShareUrl(snapshot) {
-  const url = new URL(location.href);
+  const url = new URL("/", `${normalizeServerUrl(ui.serverUrl.value)}/`);
   url.search = "";
   url.hash = "";
   url.searchParams.set("server", normalizeServerUrl(ui.serverUrl.value));
