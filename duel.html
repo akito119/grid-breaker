@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080d18" />
+    <title>GRID BREAKER // DUEL</title>
+    <link rel="stylesheet" href="duel.css" />
+  </head>
+  <body>
+    <header class="duel-topbar">
+      <div>
+        <p class="eyebrow">ALGORITHM COMBAT / PVP</p>
+        <h1>GRID BREAKER <span>DUEL</span></h1>
+      </div>
+      <div class="top-actions">
+        <span id="serverStatus" class="status-dot">SERVER CHECK</span>
+        <a class="ghost-link" href="./">1人用へ</a>
+      </div>
+    </header>
+
+    <main>
+      <section id="lobby" class="card lobby-card">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">ROOM TERMINAL</p>
+            <h2>ルームを作成・参加</h2>
+          </div>
+        </div>
+        <label class="field wide">
+          <span>ルームサーバーURL</span>
+          <input id="serverUrl" type="url" placeholder="http://localhost:4173" />
+        </label>
+        <label class="field">
+          <span>プレイヤー名</span>
+          <input id="playerName" maxlength="24" value="PLAYER" />
+        </label>
+        <div class="lobby-grid">
+          <form id="createForm" class="subcard">
+            <h3>CREATE ROOM</h3>
+            <div class="settings-grid">
+              <label><span>ターン数</span><input name="maxTurns" type="number" value="5" min="1" max="20" /></label>
+              <label><span>最大HP</span><input name="maxHp" type="number" value="100" min="10" max="1000" /></label>
+              <label><span>最大MP</span><input name="maxMp" type="number" value="80" min="1" max="10000" /></label>
+              <label><span>トークン上限</span><input name="tokenLimit" type="number" value="4" min="1" max="12" /></label>
+              <label><span>壁上限 / 人</span><input name="wallLimit" type="number" value="8" min="0" max="100" /></label>
+              <label><span>グリッド</span><input name="gridSize" type="number" value="12" min="6" max="30" /></label>
+              <label><span>壁配置時間</span><input name="wallPlacementSeconds" type="number" value="45" min="10" max="300" /></label>
+              <label><span>メソッド構築時間</span><input name="methodBuildSeconds" type="number" value="180" min="30" max="900" /></label>
+              <label><span>トークン配置時間</span><input name="tokenPlacementSeconds" type="number" value="60" min="15" max="300" /></label>
+            </div>
+            <button class="primary" type="submit">ルームを作成</button>
+          </form>
+          <form id="joinForm" class="subcard join-card">
+            <h3>JOIN ROOM</h3>
+            <label class="field">
+              <span>ルームコード</span>
+              <input id="joinRoomId" maxlength="6" autocomplete="off" placeholder="ABC123" />
+            </label>
+            <button class="primary" type="submit">ルームへ参加</button>
+          </form>
+        </div>
+        <p id="lobbyError" class="error-text"></p>
+      </section>
+
+      <section id="game" class="game-layout hidden">
+        <div class="arena-column">
+          <section class="card room-header">
+            <div>
+              <p class="eyebrow">ROOM <strong id="roomId">------</strong></p>
+              <h2 id="phaseTitle">WAITING</h2>
+            </div>
+            <div class="phase-clock"><span id="turnText">TURN 0</span><strong id="timerText">--:--</strong></div>
+            <div class="share-row">
+              <input id="shareUrl" readonly />
+              <button id="copyShare" type="button">URLをコピー</button>
+            </div>
+          </section>
+
+          <section class="versus-grid">
+            <article class="card player-card me">
+              <span id="meSide" class="side-badge">A</span>
+              <div><strong id="meName">YOU</strong><small>YOU</small></div>
+              <div class="meter"><span>HP</span><strong id="meHp">--</strong></div>
+              <div class="meter"><span>MP</span><strong id="meMp">--</strong></div>
+              <em id="meReady">EDITING</em>
+            </article>
+            <div class="versus">VS</div>
+            <article class="card player-card enemy">
+              <span id="enemySide" class="side-badge">B</span>
+              <div><strong id="enemyName">WAITING</strong><small>OPPONENT</small></div>
+              <div class="meter"><span>HP</span><strong id="enemyHp">--</strong></div>
+              <div class="meter"><span>MP</span><strong id="enemyMp">--</strong></div>
+              <em id="enemyReady">OFFLINE</em>
+            </article>
+          </section>
+
+          <section class="card arena-card">
+            <canvas id="duelArena" aria-label="対戦グリッド"></canvas>
+            <p class="arena-help" id="arenaHelp">ルームへの参加を待っています。</p>
+          </section>
+
+          <section class="card log-card">
+            <div class="card-heading"><h3>EVENT LOG</h3><span id="pollStatus">SYNC</span></div>
+            <pre id="eventLog"></pre>
+          </section>
+        </div>
+
+        <div class="control-column">
+          <section id="waitingPanel" class="card phase-panel">
+            <p class="eyebrow">WAITING</p>
+            <h2>対戦相手を待っています</h2>
+            <p>共有URLを相手へ送り、GitHub PagesまたはこのPCの画面から参加してもらってください。</p>
+          </section>
+
+          <section id="wallsPanel" class="card phase-panel hidden">
+            <p class="eyebrow">WALL PLACEMENT</p>
+            <h2>壁候補を配置</h2>
+            <p>グリッドをクリックして壁候補を指定します。両者の確定後、連結性を保てる候補だけが採用されます。</p>
+            <div class="phase-summary"><span>候補</span><strong><span id="wallCount">0</span> / <span id="wallLimit">0</span></strong></div>
+            <button id="submitWalls" class="primary" type="button">壁候補を確定</button>
+          </section>
+
+          <section id="methodsPanel" class="card phase-panel hidden">
+            <p class="eyebrow">METHOD BUILD</p>
+            <h2>メソッドを構築</h2>
+            <div class="method-meta-grid">
+              <label><span>名前</span><input id="methodName" value="SCAN-01" /></label>
+              <label><span>種別</span><select id="methodType"><option value="coordinate">座標指定型</option><option value="homing">誘導型</option><option value="defense">防御型</option></select></label>
+              <label><span>言語</span><select id="methodLanguage"><option value="python">Python</option><option value="cpp">C++</option><option value="java">Java</option></select></label>
+              <label><span>ダメージ / 軽減</span><input id="methodEffect" type="number" value="10" min="1" /></label>
+            </div>
+            <textarea id="methodCode" class="code-editor" spellcheck="false"></textarea>
+            <div class="button-row">
+              <button id="saveMethod" type="button">メソッドを保存</button>
+              <button id="newMethod" type="button">新規</button>
+            </div>
+            <div id="methodList" class="method-list"></div>
+            <button id="submitMethods" class="primary" type="button">メソッド構築を確定</button>
+          </section>
+
+          <section id="placementPanel" class="card phase-panel hidden">
+            <p class="eyebrow">TOKEN DEPLOYMENT</p>
+            <h2>トークンを配置</h2>
+            <p>座標は自分側へ正規化されています。HP合計を現在HPと一致させてください。</p>
+            <div class="phase-summary"><span>HP合計</span><strong id="placementHp">0 / 0</strong></div>
+            <div id="tokenRows" class="token-rows"></div>
+            <div class="button-row"><button id="addToken" type="button">トークン追加</button></div>
+            <button id="submitPlacement" class="primary" type="button">配置を確定</button>
+          </section>
+
+          <section id="resolvingPanel" class="card phase-panel hidden">
+            <p class="eyebrow">RESOLUTION</p>
+            <h2>コードを実行しています</h2>
+            <div class="loader"></div>
+            <p>処理順ごとにWandboxで実行時間と使用メモリを計測しています。</p>
+          </section>
+
+          <section id="resultPanel" class="card phase-panel hidden">
+            <p class="eyebrow">TURN RESULT</p>
+            <h2 id="resultTitle">ターン終了</h2>
+            <p id="resultText"></p>
+            <button id="nextTurn" class="primary" type="button">次のターンへ</button>
+          </section>
+
+          <p id="gameError" class="error-text"></p>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="duel.js"></script>
+  </body>
+</html>

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check app.js && node --check game-core.js && node --check runners.js && node --check server.mjs && node test.mjs",
-    "smoke": "node smoke-wandbox.mjs"
+    "check": "node --check app.js && node --check game-core.js && node --check runners.js && node --check duel.js && node --check duel-core.js && node --check duel-runners.js && node --check duel-service.mjs && node --check server.mjs && node test.mjs && node duel-test.mjs",
+    "smoke": "node smoke-wandbox.mjs",
+    "smoke:duel": "node smoke-duel.mjs"
   }
 }

@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { handleDuelApi } from "./duel-service.mjs";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const port = Number(process.env.PORT || 4173);
@@ -9,13 +10,16 @@ const types = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
 };
 
 createServer(async (request, response) => {
   try {
-    const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
+    const url = new URL(request.url, "http://localhost");
+    if (await handleDuelApi(request, response, url)) return;
+    const pathname = decodeURIComponent(url.pathname);
     const relative = normalize(pathname === "/" ? "index.html" : pathname.replace(/^\/+/, ""));
     const target = join(root, relative);
     if (!target.startsWith(root)) throw new Error("invalid path");
@@ -32,4 +36,5 @@ createServer(async (request, response) => {
   }
 }).listen(port, "0.0.0.0", () => {
   console.log(`GRID BREAKER is running at http://localhost:${port}`);
+  console.log(`DUEL MODE is available at http://localhost:${port}/duel.html`);
 });

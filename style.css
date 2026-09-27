@@ -92,6 +92,7 @@ h2 { font-size: clamp(20px, 2vw, 28px); letter-spacing: -0.035em; }
 .api-status.error i { background: var(--danger); }
 
 .button, .icon-button, .language-tab, .console-tab { border: 0; cursor: pointer; }
+.top-actions a.button { display: inline-flex; align-items: center; color: inherit; text-decoration: none; }
 .button, .icon-button {
   border: 1px solid var(--border);
   border-radius: 9px;
