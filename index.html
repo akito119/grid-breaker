@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090d18" />
+    <title>GRID BREAKER</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">GB</div>
+        <div>
+          <p class="eyebrow">ALGORITHM COMBAT</p>
+          <h1>GRID BREAKER</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="apiStatus" class="api-status"><i></i> Wandbox 接続待ち</span>
+        <button id="helpButton" class="icon-button" type="button" aria-label="遊び方">?</button>
+        <button id="newGameButton" class="button ghost" type="button">新しい敵</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="mission-panel panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">MISSION BRIEF</p>
+            <h2 id="missionTitle">装甲グリッドを攻略せよ</h2>
+          </div>
+          <div class="turn-counter"><span id="turnCurrent">0</span><small>/ <span id="turnMax">0</span> TURN</small></div>
+        </div>
+
+        <div class="mission-copy">
+          <p>
+            <strong><span id="gridN">-</span> × <span id="gridM">-</span></strong> の装甲グリッドに
+            <strong><span id="hitboxK">-</span>個</strong>の弱点を検出した。
+            <code>move(row, col)</code> で隣接セルを移動し、全弱点のHPを0にせよ。
+          </p>
+          <p class="muted">座標は0始まり。弱点の位置とHPは公開済み。斜め移動・ジャンプ・待機はできません。</p>
+        </div>
+
+        <details class="argument-guide" open>
+          <summary>
+            <span class="eyebrow">INPUT REFERENCE</span>
+            <strong><code>attack(...)</code> に渡される引数</strong>
+          </summary>
+          <p class="argument-signature"><code>attack(n, m, start, targets, stepLimit, move)</code></p>
+          <dl class="argument-grid">
+            <div>
+              <dt><code>n</code></dt>
+              <dd>グリッドの行数。<code>row</code> は <code>0 ... n-1</code>。</dd>
+            </div>
+            <div>
+              <dt><code>m</code></dt>
+              <dd>グリッドの列数。<code>col</code> は <code>0 ... m-1</code>。</dd>
+            </div>
+            <div>
+              <dt><code>start</code></dt>
+              <dd>このターンの開始座標 <code>(row, col)</code>。前ターンの終了地点を引き継ぐ。</dd>
+            </div>
+            <div>
+              <dt><code>targets</code></dt>
+              <dd>未破壊の弱点一覧。各要素は <code>(row, col, hp)</code>／<code>Target{row, col, hp}</code>。</dd>
+            </div>
+            <div>
+              <dt><code>stepLimit</code></dt>
+              <dd>このターンに許可される移動回数。Pythonでは <code>step_limit</code>。</dd>
+            </div>
+            <div>
+              <dt><code>move</code></dt>
+              <dd>次の隣接セルを記録する関数。Python/C++は <code>move(row, col)</code>、Javaは <code>move.go(row, col)</code>。</dd>
+            </div>
+          </dl>
+          <p class="argument-note">開始地点は自動では攻撃しません。<code>move</code> で弱点セルへ入るたびに、その弱点へ1回ダメージを与えます。</p>
+        </details>
+
+        <div class="stats-strip six">
+          <div><span>GRID</span><strong id="gridStat">--</strong></div>
+          <div><span>WEAK POINTS</span><strong id="weakStat">--</strong></div>
+          <div><span>HP / POINT</span><strong id="hpStat">--</strong></div>
+          <div><span>TURN LIMIT</span><strong id="turnStat">--</strong></div>
+          <div><span>STEP LIMIT</span><strong id="stepStat">--</strong></div>
+          <div><span>START</span><strong id="startStat">--</strong></div>
+        </div>
+
+        <div class="arena-wrap">
+          <canvas id="arena" aria-label="敵のグリッドと攻撃経路"></canvas>
+          <div id="arenaMessage" class="arena-message hidden">
+            <div class="result-card">
+              <p id="resultEyebrow" class="result-eyebrow">MISSION COMPLETE</p>
+              <h3 id="resultTitle">TARGET DOWN</h3>
+              <div id="scorePanel" class="score-panel">
+                <span class="score-label">CLEAR SCORE</span>
+                <div class="score-total"><span id="scoreRank">A</span><strong id="clearScore">0</strong></div>
+                <div class="score-breakdown">
+                  <span>BASE <strong id="baseScore">0</strong></span>
+                  <span>TURN <strong id="turnBonus">0</strong></span>
+                  <span>ROUTE <strong id="routeBonus">0</strong></span>
+                  <span>CODE <strong id="codeBonus">0</strong></span>
+                  <span>RESOURCE <strong id="resourceBonus">0</strong></span>
+                </div>
+              </div>
+              <button id="continueButton" class="button continue-button" type="button">
+                <span>CONTINUE</span><small>次の敵へ</small>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="weakpoint-list-wrap">
+          <div class="subheading"><span>WEAK POINT STATUS</span><span id="enemyHpText">TOTAL HP --</span></div>
+          <div id="weakpointList" class="weakpoint-list"></div>
+        </div>
+      </section>
+
+      <section class="code-panel panel">
+        <div class="editor-toolbar">
+          <div class="language-tabs" role="tablist" aria-label="言語">
+            <button class="language-tab active" data-language="python" role="tab" type="button">Python</button>
+            <button class="language-tab" data-language="cpp" role="tab" type="button">C++</button>
+            <button class="language-tab" data-language="java" role="tab" type="button">Java</button>
+          </div>
+          <div class="toolbar-meta"><span id="compilerLabel">CPython 3.13</span><span id="codeLength">0 bytes</span></div>
+        </div>
+
+        <div class="editor-frame">
+          <div id="editor"></div>
+          <textarea id="editorFallback" spellcheck="false" aria-label="ソースコード"></textarea>
+        </div>
+
+        <div class="formula-card">
+          <div>
+            <span class="formula-label">DAMAGE FORMULA</span>
+            <code>基準値 − 12 × コード長比 − 6 × 実行時間比 × メモリ比</code>
+          </div>
+          <div class="formula-preview"><span>予測</span><strong id="damagePreview">--</strong><small> / HIT</small></div>
+        </div>
+
+        <button id="runButton" class="button run-button" type="button">
+          <span class="play-icon">▶</span><span id="runButtonText">攻撃を実行</span><kbd>Ctrl ↵</kbd>
+        </button>
+
+        <div class="console-block">
+          <div class="console-tabs">
+            <button class="console-tab active" data-console="battle" type="button">戦闘ログ</button>
+            <button class="console-tab" data-console="compiler" type="button">コンパイラ</button>
+            <button class="console-tab" data-console="output" type="button">標準出力</button>
+          </div>
+          <pre id="battleConsole" class="console active" aria-live="polite"></pre>
+          <pre id="compilerConsole" class="console"></pre>
+          <pre id="outputConsole" class="console"></pre>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="helpDialog">
+      <button id="closeHelp" class="dialog-close" type="button" aria-label="閉じる">×</button>
+      <p class="eyebrow">HOW TO PLAY</p>
+      <h2>コードで敵を走査する</h2>
+      <ol>
+        <li>Python・C++・Javaから言語を選びます。</li>
+        <li>公開された開始位置・弱点・歩数上限を使って経路を考えます。</li>
+        <li><code>attack(..., move)</code> の中で <code>move(row, col)</code> を呼び、上下左右の隣接セルへ移動します。</li>
+        <li>提出コードはWandboxの隔離環境で実行されます。結果の座標列をブラウザで再生します。</li>
+        <li>弱点セルへ入るたびに攻撃。ターンの終了位置は次の開始位置になります。</li>
+        <li>短く、速く、省メモリなコードほど1回の命中ダメージが高くなります。</li>
+      </ol>
+      <p class="notice">Wandboxは外部サービスです。ネットワーク障害や利用制限時は実行できません。ゲームやコードはブラウザ内に自動保存されます。</p>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

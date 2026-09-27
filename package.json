@@ -1,0 +1,11 @@
+{
+  "name": "grid-breaker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node --check app.js && node --check game-core.js && node --check runners.js && node --check server.mjs && node test.mjs",
+    "smoke": "node smoke-wandbox.mjs"
+  }
+}

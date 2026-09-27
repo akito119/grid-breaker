@@ -1,0 +1,382 @@
+:root {
+  color-scheme: dark;
+  --bg: #070b14;
+  --surface: rgba(16, 23, 40, 0.94);
+  --surface-2: #11192c;
+  --surface-3: #0b1120;
+  --border: rgba(151, 174, 216, 0.17);
+  --text: #f5f8ff;
+  --muted: #8c9ab5;
+  --cyan: #5be7ff;
+  --violet: #9882ff;
+  --danger: #ff5c7f;
+  --warning: #ffd069;
+  --success: #61efb1;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+  font-family: Inter, "Noto Sans JP", "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { min-width: 320px; background: var(--bg); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% -10%, rgba(84, 111, 255, 0.16), transparent 38%),
+    radial-gradient(circle at 96% 88%, rgba(53, 222, 245, 0.08), transparent 32%),
+    var(--bg);
+}
+
+button, textarea { font: inherit; }
+button { color: inherit; }
+h1, h2, p { margin: 0; }
+code, kbd, pre { font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace; }
+
+.noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.topbar {
+  min-height: 80px;
+  padding: 14px clamp(18px, 4vw, 64px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(7, 11, 20, 0.75);
+  backdrop-filter: blur(18px);
+}
+
+.brand, .top-actions, .section-heading, .editor-toolbar, .subheading, .formula-card {
+  display: flex;
+  align-items: center;
+}
+
+.brand { gap: 14px; }
+.brand-mark {
+  width: 42px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(91, 231, 255, 0.62);
+  border-radius: 10px;
+  color: var(--cyan);
+  font: 800 13px/1 "Cascadia Code", monospace;
+  box-shadow: inset 0 0 18px rgba(91, 231, 255, 0.12), 0 0 22px rgba(91, 231, 255, 0.08);
+}
+
+h1 { font-size: 18px; letter-spacing: 0.14em; }
+h2 { font-size: clamp(20px, 2vw, 28px); letter-spacing: -0.035em; }
+.eyebrow { color: var(--cyan); font: 700 10px/1.65 "Cascadia Code", monospace; letter-spacing: 0.18em; }
+.top-actions { gap: 11px; }
+.api-status { color: var(--muted); font-size: 12px; }
+.api-status i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--warning);
+  box-shadow: 0 0 10px currentColor;
+}
+.api-status.online i { background: var(--success); }
+.api-status.error i { background: var(--danger); }
+
+.button, .icon-button, .language-tab, .console-tab { border: 0; cursor: pointer; }
+.button, .icon-button {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-2);
+  transition: transform 150ms ease, border-color 150ms ease, filter 150ms ease;
+}
+.button:hover, .icon-button:hover { transform: translateY(-1px); border-color: rgba(91, 231, 255, 0.55); }
+.button.ghost { padding: 10px 15px; font-size: 12px; font-weight: 750; }
+.icon-button { width: 37px; height: 37px; color: var(--muted); font-weight: 800; }
+
+.app-shell {
+  width: min(1580px, calc(100% - 36px));
+  margin: 24px auto 42px;
+  display: grid;
+  grid-template-columns: minmax(430px, 0.92fr) minmax(540px, 1.08fr);
+  gap: 20px;
+}
+
+.panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(21, 29, 49, 0.95), rgba(10, 15, 27, 0.97));
+  box-shadow: var(--shadow);
+}
+
+.mission-panel { padding: clamp(19px, 2.4vw, 34px); }
+.section-heading { justify-content: space-between; gap: 20px; }
+.turn-counter { display: flex; align-items: baseline; gap: 6px; color: var(--cyan); font: 800 32px/1 "Cascadia Code", monospace; }
+.turn-counter small { color: var(--muted); font-size: 10px; letter-spacing: 0.08em; }
+.mission-copy { margin-top: 18px; color: #c9d4e8; font-size: 14px; line-height: 1.75; }
+.mission-copy strong { color: #fff; }
+.mission-copy code { color: var(--cyan); }
+.muted { margin-top: 5px; color: var(--muted); font-size: 12px; }
+
+.argument-guide {
+  margin-top: 15px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: rgba(6, 11, 21, 0.46);
+}
+.argument-guide summary {
+  position: relative;
+  min-height: 46px;
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.argument-guide summary::-webkit-details-marker { display: none; }
+.argument-guide summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--cyan);
+  font: 700 17px/1 "Cascadia Code", monospace;
+}
+.argument-guide[open] summary { border-bottom: 1px solid var(--border); }
+.argument-guide[open] summary::after { content: "−"; }
+.argument-guide summary strong { color: #dce7f8; font-size: 12px; }
+.argument-guide summary code, .argument-guide code { color: var(--cyan); }
+.argument-signature {
+  padding: 11px 13px 0;
+  color: #b8c5d9;
+  font-size: 11px;
+}
+.argument-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 10px 13px;
+  background: var(--border);
+}
+.argument-grid div { min-width: 0; padding: 9px 10px; background: #0b1221; }
+.argument-grid dt { margin-bottom: 4px; font: 750 11px/1.2 "Cascadia Code", monospace; }
+.argument-grid dd { margin: 0; color: #98a8c1; font-size: 10px; line-height: 1.55; }
+.argument-note {
+  margin: 0 13px 12px;
+  padding: 9px 10px;
+  border-left: 2px solid var(--warning);
+  color: #aebbd0;
+  background: rgba(255, 208, 105, 0.04);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  overflow: hidden;
+  background: rgba(6, 11, 21, 0.52);
+}
+.stats-strip div { min-width: 0; padding: 12px 13px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.stats-strip div:nth-child(3n) { border-right: 0; }
+.stats-strip div:nth-last-child(-n+3) { border-bottom: 0; }
+.stats-strip span, .formula-label { display: block; color: var(--muted); font: 700 9px/1.4 "Cascadia Code", monospace; letter-spacing: 0.1em; }
+.stats-strip strong { display: block; overflow: hidden; margin-top: 5px; color: #edf4ff; font: 700 16px/1.1 "Cascadia Code", monospace; text-overflow: ellipsis; white-space: nowrap; }
+#stepStat { color: var(--cyan); }
+
+.arena-wrap {
+  position: relative;
+  height: clamp(330px, 38vw, 540px);
+  min-height: 330px;
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #070c17;
+}
+#arena { width: 100%; height: 100%; display: block; }
+.arena-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 30px;
+  background: rgba(3, 7, 14, 0.74);
+  backdrop-filter: blur(3px);
+  text-align: center;
+}
+.result-card {
+  width: min(430px, calc(100% - 24px));
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid rgba(97, 239, 177, 0.35);
+  border-radius: 15px;
+  background: linear-gradient(150deg, rgba(17, 31, 47, 0.97), rgba(8, 15, 27, 0.98));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), inset 0 0 32px rgba(97, 239, 177, 0.035);
+}
+.result-eyebrow { color: var(--success); font: 700 10px/1.4 "Cascadia Code", monospace; letter-spacing: 0.2em; }
+.result-card h3 {
+  margin: 7px 0 18px;
+  color: var(--success);
+  text-shadow: 0 0 26px rgba(97, 239, 177, 0.55);
+  font: 850 clamp(25px, 4vw, 42px)/1.05 "Cascadia Code", monospace;
+  letter-spacing: 0.08em;
+}
+.score-panel { padding: 15px; border: 1px solid var(--border); border-radius: 10px; background: rgba(5, 10, 19, 0.62); }
+.score-label { color: var(--muted); font: 700 9px/1 "Cascadia Code", monospace; letter-spacing: 0.16em; }
+.score-total { display: flex; align-items: center; justify-content: center; gap: 13px; margin-top: 7px; }
+.score-total > span {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 208, 105, 0.48);
+  border-radius: 9px;
+  color: var(--warning);
+  background: rgba(255, 208, 105, 0.07);
+  font: 850 23px/1 "Cascadia Code", monospace;
+}
+.score-total > strong { color: #fff; font: 850 clamp(30px, 5vw, 48px)/1 "Cascadia Code", monospace; letter-spacing: -0.04em; }
+.score-breakdown { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 13px; }
+.score-breakdown span { min-width: 0; color: #697994; font: 700 7px/1.4 "Cascadia Code", monospace; letter-spacing: 0.04em; }
+.score-breakdown strong { display: block; margin-top: 3px; color: #b9c7db; font-size: 10px; }
+.continue-button {
+  width: 100%;
+  margin-top: 13px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-color: rgba(91, 231, 255, 0.48);
+  color: #031216;
+  background: linear-gradient(135deg, #75f0ff, #45c7e2);
+  font-weight: 850;
+}
+.continue-button small { font-size: 10px; opacity: 0.65; }
+.arena-message.lose .result-card { border-color: rgba(255, 92, 127, 0.35); }
+.arena-message.lose .result-eyebrow, .arena-message.lose .result-card h3 { color: var(--danger); }
+.arena-message.lose .score-panel { display: none; }
+.hidden { display: none !important; }
+
+.weakpoint-list-wrap { margin-top: 18px; }
+.subheading { justify-content: space-between; gap: 20px; color: var(--muted); font: 700 10px/1 "Cascadia Code", monospace; letter-spacing: 0.09em; }
+.weakpoint-list { display: grid; gap: 8px; margin-top: 11px; }
+.weakpoint-row { display: grid; grid-template-columns: minmax(120px, 1fr) 1.5fr 78px; gap: 10px; align-items: center; font: 600 11px/1 "Cascadia Code", monospace; }
+.weakpoint-name { color: var(--cyan); white-space: nowrap; }
+.weakpoint-name.destroyed { color: #56637a; text-decoration: line-through; }
+.hp-track { height: 7px; overflow: hidden; border-radius: 99px; background: rgba(255, 255, 255, 0.08); }
+.hp-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--danger), #ff9d72); transition: width 300ms ease; }
+.hp-fill.destroyed { background: #46536b; }
+.weakpoint-hp { color: #cbd6e9; text-align: right; white-space: nowrap; }
+
+.code-panel { display: flex; flex-direction: column; }
+.editor-toolbar { min-height: 58px; justify-content: space-between; gap: 12px; padding: 0 17px; border-bottom: 1px solid var(--border); }
+.language-tabs, .console-tabs { display: flex; gap: 3px; }
+.language-tab, .console-tab { position: relative; padding: 10px 13px; color: var(--muted); background: transparent; font-size: 12px; font-weight: 750; }
+.language-tab.active, .console-tab.active { color: var(--text); }
+.language-tab.active::after, .console-tab.active::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: -1px;
+  left: 10px;
+  height: 2px;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+}
+.toolbar-meta { display: flex; gap: 13px; color: var(--muted); font: 500 10px/1 "Cascadia Code", monospace; }
+
+.editor-frame { position: relative; min-height: 475px; flex: 1; background: #0a1020; }
+#editor, #editorFallback { position: absolute; inset: 0; }
+#editorFallback {
+  width: 100%;
+  height: 100%;
+  padding: 19px;
+  resize: none;
+  border: 0;
+  outline: 0;
+  color: #dce8ff;
+  background: #0a1020;
+  font: 13px/1.7 "Cascadia Code", Consolas, monospace;
+  tab-size: 4;
+}
+
+.formula-card { justify-content: space-between; gap: 18px; margin: 14px 16px 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: rgba(91, 231, 255, 0.035); }
+.formula-card code { color: #acbad1; font-size: 10px; }
+.formula-preview { min-width: 112px; text-align: right; white-space: nowrap; }
+.formula-preview span, .formula-preview small { color: var(--muted); font-size: 10px; }
+.formula-preview strong { color: var(--cyan); font: 800 23px/1 "Cascadia Code", monospace; }
+
+.run-button {
+  position: relative;
+  margin: 12px 16px 0;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-color: rgba(91, 231, 255, 0.48);
+  color: #031216;
+  background: linear-gradient(135deg, #75f0ff, #45c7e2);
+  box-shadow: 0 10px 30px rgba(50, 212, 238, 0.14);
+  font-weight: 850;
+}
+.run-button:hover { border-color: #c0f9ff; filter: brightness(1.04); }
+.run-button:disabled { cursor: wait; opacity: 0.55; transform: none; }
+.run-button kbd { position: absolute; right: 17px; padding: 4px 6px; border-radius: 4px; color: rgba(3, 18, 22, 0.68); background: rgba(255, 255, 255, 0.28); font-size: 9px; }
+.play-icon { font-size: 11px; }
+
+.console-block { min-height: 195px; margin-top: 14px; border-top: 1px solid var(--border); background: #070c17; }
+.console-tabs { height: 42px; padding: 0 11px; border-bottom: 1px solid var(--border); }
+.console { display: none; height: 152px; margin: 0; padding: 14px 17px; overflow: auto; white-space: pre-wrap; color: #9aa9c2; font: 11px/1.65 "Cascadia Code", Consolas, monospace; }
+.console.active { display: block; }
+
+dialog { width: min(590px, calc(100% - 30px)); padding: 30px; border: 1px solid rgba(91, 231, 255, 0.3); border-radius: 15px; color: var(--text); background: #10182a; box-shadow: var(--shadow); }
+dialog::backdrop { background: rgba(2, 5, 11, 0.8); backdrop-filter: blur(5px); }
+dialog h2 { margin-top: 4px; }
+dialog ol { padding-left: 22px; color: #c8d4e7; line-height: 1.7; }
+dialog li + li { margin-top: 7px; }
+dialog code { color: var(--cyan); }
+.dialog-close { position: absolute; top: 11px; right: 13px; border: 0; color: var(--muted); background: none; cursor: pointer; font-size: 24px; }
+.notice { padding: 12px; border-left: 2px solid var(--warning); color: var(--muted); background: rgba(255, 208, 105, 0.05); font-size: 12px; line-height: 1.65; }
+
+@media (max-width: 1090px) {
+  .app-shell { grid-template-columns: 1fr; max-width: 860px; }
+  .editor-frame { min-height: 560px; }
+}
+
+@media (max-width: 680px) {
+  .topbar { min-height: 68px; padding: 12px 16px; }
+  .api-status, .button.ghost { display: none; }
+  .app-shell { width: calc(100% - 20px); margin-top: 10px; }
+  .mission-panel { padding: 17px; }
+  .argument-guide summary { align-items: flex-start; flex-direction: column; gap: 2px; }
+  .argument-guide summary::after { position: absolute; top: 14px; right: 13px; }
+  .argument-grid { grid-template-columns: 1fr; }
+  .section-heading { align-items: flex-end; }
+  .turn-counter { font-size: 26px; }
+  .stats-strip { grid-template-columns: 1fr 1fr; }
+  .stats-strip div { border-right: 1px solid var(--border) !important; border-bottom: 1px solid var(--border) !important; }
+  .stats-strip div:nth-child(2n) { border-right: 0 !important; }
+  .stats-strip div:nth-last-child(-n+2) { border-bottom: 0 !important; }
+  .arena-wrap { height: 370px; }
+  .weakpoint-row { grid-template-columns: 115px 1fr 68px; font-size: 10px; }
+  .editor-toolbar { padding: 0 9px; }
+  .language-tab { padding-inline: 9px; }
+  .toolbar-meta span:first-child, .formula-card code, .run-button kbd { display: none; }
+  .editor-frame { min-height: 500px; }
+}
