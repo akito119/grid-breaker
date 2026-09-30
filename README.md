@@ -6,27 +6,41 @@ Python・C++・Javaで盤面を移動するメソッドを作り、相手のト�
 
 ## 必要なもの
 
-ホストPCに以下を用意してください。
+ホストPCに以下を用意してください。特定のOSやLinux環境は必要ありません。
 
-- UbuntuまたはWSL2上のUbuntu
-- Node.js 20以降
-- `cloudflared`
-- インターネット接続
+- Node.js 20以降（`node`と`npm`を使用します）
+- 対応ブラウザ
+- インターネット接続（プレイヤーコードをWandboxで実行するため）
+- `cloudflared`（インターネット経由で対戦相手へ公開する場合のみ）
 
-このプロジェクトにnpm依存パッケージはありません。
+サーバーはNode.jsの標準機能だけで動作し、このプロジェクトにnpm依存パッケージはありません。対戦相手は共有URLをブラウザで開くため、Node.jsや`cloudflared`を用意する必要はありません。
 
 ## 起動方法
 
 ### 1. ゲームサーバーを起動する
 
-Ubuntuで次を実行します。
+ターミナルで、このリポジトリのディレクトリへ移動して起動します。
 
 ```bash
-cd /home/akito/project/game
+cd grid-breaker
 npm start
 ```
 
-ローカルでは <http://localhost:4173/> で開けます。
+既定ではポート`4173`を使用し、<http://localhost:4173/> で開けます。別のポートを使う場合は、`PORT`環境変数を指定して起動してください。
+
+macOS・Linux:
+
+```bash
+PORT=3000 npm start
+```
+
+Windows PowerShell:
+
+```powershell
+$env:PORT=3000; npm start
+```
+
+この例では <http://localhost:3000/> で開けます。実際に使用するURLは、起動時にターミナルへ表示されます。
 
 ### 2. 外部公開URLを発行する
 
@@ -34,6 +48,12 @@ npm start
 
 ```bash
 cloudflared tunnel --url http://localhost:4173
+```
+
+ポートを変更した場合は、ここにも同じ番号を指定します。たとえばポート`3000`で起動した場合は次のとおりです。
+
+```bash
+cloudflared tunnel --url http://localhost:3000
 ```
 
 次のようなURLが表示されます。
